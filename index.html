@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽奖工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧抽奖设置面板 -->
+        <button class="toggle-btn" id="toggleBtn">
+            <i class="icon" id="toggleIcon">←</i>
+        </button>
+        <div class="settings-panel" id="settingsPanel">
+            <div class="panel-header">
+                <h2>活动设置</h2>
+            </div>
+            <div class="panel-content" id="panelContent">
+                <!-- 活动名称输入区 -->
+                <div class="form-group">
+                    <label for="activityName">活动名称</label>
+                    <input type="text" id="activityName" name="activityName" placeholder="请输入活动名称">
+                </div>
+                <div class="form-group">
+                    <label for="activityBackground">活动背景图</label>
+                    <input type="file" id="activityBackground" name="activityBackground" accept="image/*" class="award-image">
+                    <div id="backgroundPreviewContainer">
+                        <div class="image-overlay" id="backgroundOverlay">
+                            <button type="button" class="replace-btn" onclick="replaceBackground()">替换图片</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 奖项设置表格区 -->
+                <div class="form-group">
+                    <label>奖项设置</label>
+                    <div class="table-container">
+                        <table id="awardsTable">
+                            <thead>
+                                <tr>
+                                    <th>奖项名称</th>
+                                    <th>奖项图片</th>
+                                    <th>奖项名额</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="award-name" placeholder="请输入奖项名称" maxlength="30">
+                                    </td>
+                                    <td>
+                                        <input type="file" class="award-image" accept="image/*">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="award-quota" min="1" max="100" value="1" step="1" onchange="ensureMinValue(this)">
+                                    </td>
+                                    <td>
+                                        <button class="add-row-btn">+</button>
+                                        <button class="delete-row-btn" disabled>-</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 名单设置表格区 -->
+                <div class="form-group">
+                    <label>名单设置</label>
+                    <div class="import-container">
+                        <button id="importBtn">导入表格</button>
+                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;">
+                    </div>
+                    <div class="table-container">
+                        <table id="participantsTable">
+                            <thead>
+                                <tr>
+                                    <th>人员姓名</th>
+                                    <th>抽奖票数</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" class="participant-name" placeholder="请输入人员姓名" maxlength="30">
+                                    </td>
+                                    <td>
+                                        <input type="number" class="participant-count" min="1" max="100" value="1" step="1" onchange="ensureMinValue(this)">
+                                    </td>
+                                    <td>
+                                        <button class="add-row-btn">+</button>
+                                        <button class="delete-row-btn" disabled>-</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+            <!-- 按钮区 -->
+            <div class="button-group">
+                <button id="resetBtn">重置设置</button>
+                <button id="saveBtn">保存设置</button>
+            </div>
+        </div>
+
+        <!-- 右侧抽奖大屏区 -->
+        <div class="lottery-panel">
+            <!-- 中奖动效容器 -->
+            <div id="winEffectContainer" class="win-effect-container">
+                <div class="win-content">
+                    <h2>恭喜中奖！</h2>
+                    <p id="winName"></p>
+                    <p id="winAward"></p>
+                </div>
+                <div id="confettiContainer" class="confetti-container"></div>
+            </div>
+            <!-- 缺省状态展示区 -->
+            <div class="default-state" id="defaultState">
+                <div class="default-content">
+                    <i class="default-icon">🎯</i>
+                    <p>请先配置抽奖活动</p>
+                </div>
+            </div>
+
+            <!-- 正常状态展示区 -->
+            <div class="normal-state" id="normalState" style="display: none;">
+                <!-- 全屏按钮 -->
+                <button id="fullscreenBtn" class="fullscreen-btn">
+                    <svg t="1771254474874" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1575" width="50" height="50"><path d="M145.066667 85.333333h153.6c25.6 0 42.666667-17.066667 42.666666-42.666666S324.266667 0 298.666667 0H34.133333C25.6 0 17.066667 8.533333 8.533333 17.066667 0 25.6 0 34.133333 0 42.666667v256c0 25.6 17.066667 42.666667 42.666667 42.666666s42.666667-17.066667 42.666666-42.666666V145.066667l230.4 230.4c17.066667 17.066667 42.666667 17.066667 59.733334 0 17.066667-17.066667 17.066667-42.666667 0-59.733334L145.066667 85.333333z m170.666666 563.2L162.133333 802.133333l-76.8 76.8V725.333333C85.333333 699.733333 68.266667 682.666667 42.666667 682.666667s-42.666667 17.066667-42.666667 42.666666v256c0 25.6 17.066667 42.666667 42.666667 42.666667h256c25.6 0 42.666667-17.066667 42.666666-42.666667s-17.066667-42.666667-42.666666-42.666666H145.066667l76.8-76.8 153.6-153.6c17.066667-17.066667 17.066667-42.666667 0-59.733334-17.066667-17.066667-42.666667-17.066667-59.733334 0z m665.6 34.133334c-25.6 0-42.666667 17.066667-42.666666 42.666666v153.6l-76.8-76.8-153.6-153.6c-17.066667-17.066667-42.666667-17.066667-59.733334 0-17.066667 17.066667-17.066667 42.666667 0 59.733334l153.6 153.6 76.8 76.8H725.333333c-25.6 0-42.666667 17.066667-42.666666 42.666666s17.066667 42.666667 42.666666 42.666667h256c25.6 0 42.666667-17.066667 42.666667-42.666667v-256c0-25.6-17.066667-42.666667-42.666667-42.666666z m0-682.666667h-256c-25.6 0-42.666667 17.066667-42.666666 42.666667s17.066667 42.666667 42.666666 42.666666h153.6l-76.8 76.8-153.6 153.6c-17.066667 17.066667-17.066667 42.666667 0 59.733334 17.066667 17.066667 42.666667 17.066667 59.733334 0l153.6-153.6 76.8-76.8v153.6c0 25.6 17.066667 42.666667 42.666666 42.666666s42.666667-17.066667 42.666667-42.666666v-256c0-25.6-17.066667-42.666667-42.666667-42.666667z" fill="#ffffff" p-id="1576"></path></svg>
+                </button>
+                <!-- 活动名称展示 -->
+                <h1 class="activity-title" id="activityTitle">活动名称</h1>
+                
+                <!-- 并排布局容器 -->
+                <div class="lottery-content-container">
+                    <!-- 左侧抽奖区域 -->
+                    <div class="lottery-main">
+                        <!-- 奖项选择器区 -->
+                        <div class="award-selector">
+                            <label for="awardSelect">选择奖项：</label>
+                            <select id="awardSelect">
+                                <!-- 奖项选项将通过JavaScript动态添加 -->
+                            </select>
+                        </div>
+
+                        <!-- 选中奖项信息展示区 -->
+                        <div class="award-info">
+                            <div class="award-image-container">
+                                <img id="selectedAwardImage" src="" alt="奖项图片">
+                            </div>
+                            <div class="award-details">
+                                <h2 id="selectedAwardName">奖项名称</h2>
+                                <p>名额：<span id="awardQuota">0</span> | 剩余：<span id="remainingQuota">0</span></p>
+                            </div>
+                        </div>
+
+                        <!-- 抽奖滚动名单展示区 -->
+                        <div class="lottery-wheel">
+                            <div class="wheel-container">
+                                <div id="rollingNames">请点击【开始抽奖】</div>
+                            </div>
+                        </div>
+
+                        <!-- 抽奖控制按钮 -->
+                        <div class="lottery-controls">
+                            <button id="startBtn" disabled>开始抽奖</button>
+                            <button id="stopBtn" disabled>停止抽奖</button>
+                            <button id="resetAwardBtn" disabled>重置抽奖</button>
+                        </div>
+                    </div>
+
+                    <!-- 右侧中奖记录展示区 -->
+                    <div class="winner-records">
+                        <div class="winner-records-header">
+                            <h3>中奖记录</h3>
+                            <button id="exportBtn" class="export-btn">导出Excel</button>
+                        </div>
+                        <div class="records-container" id="recordsContainer">
+                            <!-- 中奖记录将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 -->
+    <!-- 重置确认对话框 -->
+    <div class="modal" id="resetModal">
+        <div class="modal-content">
+            <h3>确认重置</h3>
+            <p>确定要重置所有设置吗？此操作不可撤销。</p>
+            <div class="modal-buttons">
+                <button id="cancelResetBtn">取消</button>
+                <button id="confirmResetBtn">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 表单验证提示弹窗 -->
+    <div class="modal" id="validationModal">
+        <div class="modal-content">
+            <h3>表单验证错误</h3>
+            <p id="validationMessage">请检查表单填写是否正确。</p>
+            <div class="modal-buttons">
+                <button id="closeValidationBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存成功提示弹窗 -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <h3>保存成功</h3>
+            <p>活动立即生效</p>
+            <div class="modal-buttons">
+                <button id="closeSuccessBtn">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 抽奖音乐 -->
+    <audio id="lotteryMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
+    
+
+    
+    <script src="script.js"></script>
+</body>
+</html>

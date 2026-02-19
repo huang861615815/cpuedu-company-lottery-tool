@@ -1,0 +1,1220 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    overflow: hidden;
+}
+
+/* 主色调定义 */
+:root {
+    --primary-color: #4a90e2;
+    --primary-light: rgba(74, 144, 226, 0.8);
+    --primary-dark: #357abd;
+    --primary-color-hover: #357abd;
+    --success-color: #4caf50;
+    --success-light: rgba(76, 175, 80, 0.8);
+    --danger-color: #f44336;
+    --danger-light: rgba(244, 67, 54, 0.8);
+    --warning-color: #ffc107;
+    --text-color: #333;
+    --text-light: #666;
+    --text-lighter: #999;
+    --bg-color: #f0f4f8;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+}
+
+/* 左侧抽奖设置面板 */
+.settings-panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 600px;
+    background-color: var(--card-bg);
+    backdrop-filter: blur(10px);
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.settings-panel.collapsed {
+    transform: translateX(-56px); /* 只隐藏面板内容，保留按钮 */
+    width: 60px;
+    min-width: 60px;
+    overflow: hidden;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.15);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 0 var(--border-radius) 0 0;
+}
+
+.panel-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn {
+    background-color: var(--primary-color);
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    width: 40px;
+    height: 60px;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 101;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.settings-panel.collapsed .toggle-btn {
+    left: 0;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.settings-panel:not(.collapsed) .toggle-btn {
+    left: 600px; /* 面板宽度，让按钮贴在面板右侧 */
+}
+
+.settings-panel:not(.collapsed) {
+    width: 600px;
+}
+
+@media (max-width: 1200px) {
+    .settings-panel {
+        width: 350px;
+        min-width: 350px;
+    }
+    
+    .settings-panel.collapsed {
+        transform: translateX(-56px);
+        width: 60px;
+        min-width: 60px;
+    }
+    
+    .settings-panel:not(.collapsed) .toggle-btn {
+        left: 350px; /* 小屏幕下面板宽度，让按钮贴在面板右侧 */
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .settings-panel {
+        width: 100%;
+        min-width: 0;
+        transform: translateY(0);
+        margin-bottom: 20px;
+    }
+    
+    .settings-panel.collapsed {
+        width: 100%;
+        height: 60px;
+        overflow: visible;
+        transform: translateY(0);
+    }
+    
+    .toggle-btn {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        border-radius: 4px 0 0 4px;
+        width: 40px;
+        height: 60px;
+        z-index: 101;
+    }
+    
+    .settings-panel:not(.collapsed) .toggle-btn {
+        right: 0;
+        transform: translateY(-50%);
+    }
+    
+    .settings-panel.collapsed .toggle-btn {
+        right: 0;
+        transform: translateY(-50%);
+    }
+    
+    .lottery-panel {
+        width: 100%;
+    }
+    
+    .prize-input-group {
+        flex-direction: column;
+    }
+    
+    .prize-input-group input,
+    .prize-input-group button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .prize-input-group button {
+        margin-left: 0;
+    }
+    
+    .winners-display {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+.panel-content {
+    padding: 25px;
+    height: calc(100% - 140px);
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* 滚动条样式优化 */
+.panel-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+    background: rgba(74, 144, 226, 0.5);
+    border-radius: 4px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 144, 226, 0.7);
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    background-color: #fff;
+}
+
+/* 活动背景图特殊样式 */
+#activityBackground {
+    display: none; /* 隐藏文件选择控件 */
+}
+
+#backgroundPreviewContainer {
+    width: 100%; /* 占满活动设置栏的宽度 */
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 比例 = 9/16 * 100% */
+    position: relative;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    background-color: #f5f5f5; /* 灰底背景 */
+}
+
+#backgroundPreviewContainer:hover {
+    border-color: #4a90e2;
+}
+
+#backgroundPreviewContainer:hover #backgroundOverlay {
+    opacity: 1;
+}
+
+/* 背景预览图片 */
+#backgroundPreview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 缺省状态提示 */
+#backgroundPreviewContainer::before {
+    content: '请上传背景图';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #999;
+    font-size: 16px;
+    text-align: center;
+    pointer-events: none; /* 让点击穿透到容器上 */
+}
+
+/* 当有图片时隐藏缺省提示 */
+#backgroundPreviewContainer.has-image::before {
+    display: none;
+}
+
+/* 表格样式 */
+.table-container {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #f5f5f5;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    width: 100px;
+    height: 60px;
+}
+
+th {
+    font-weight: 600;
+    color: #555;
+}
+
+td input {
+    width: 100%;
+}
+
+/* 图片预览容器样式 */
+.image-preview-container {
+    position: relative;
+    width: 100px;
+    height: 100px;  /* 设定固定高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* 保持比例并填充容器 */
+    display: block;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.image-overlay:hover {
+    opacity: 1;
+}
+
+.add-row-btn,
+.delete-row-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0 2px;
+    transition: background-color 0.3s;
+    padding: 0;
+}
+
+.add-row-btn {
+    background-color: #4caf50;
+    color: white;
+}
+
+.add-row-btn:hover {
+    background-color: #45a049;
+}
+
+.delete-row-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-row-btn:hover:not(:disabled) {
+    background-color: #da190b;
+}
+
+.delete-row-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* 导入按钮 */
+.import-container {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#importBtn {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#importBtn:hover {
+    background-color: var(--primary-color-hover);
+    transform: translateY(-2px);
+}
+
+/* 按钮组 */
+.button-group {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 15px;
+    padding: 20px 25px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    justify-content: center;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#resetBtn {
+    background-color: #f5f5f5;
+    color: #555;
+}
+
+#resetBtn:hover {
+    background-color: #e0e0e0;
+}
+
+#saveBtn {
+    background-color: #4a90e2;
+    color: white;
+}
+
+#saveBtn:hover {
+    background-color: #357abd;
+}
+
+/* 右侧抽奖大屏区 */
+.lottery-panel {
+    flex: 1;
+    margin-left: 400px;
+    padding: 40px;
+    background-color: var(--bg-color);
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* 背景装饰效果 */
+.lottery-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 30%, rgba(74, 144, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(76, 175, 80, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.settings-panel.collapsed + .lottery-panel {
+    margin-left: 0;
+}
+
+/* 缺省状态 */
+.default-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    z-index: 1;
+}
+
+.default-content {
+    text-align: center;
+    background-color: var(--card-bg);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.default-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    animation: pulse 2s infinite;
+}
+
+.default-content p {
+    font-size: 24px;
+    color: var(--text-lighter);
+    font-weight: 500;
+}
+
+/* 正常状态 */
+.normal-state {
+    width: 100%;
+    max-width: 1200px;
+    text-align: center;
+    z-index: 1;
+}
+
+/* 并排布局容器 */
+.lottery-content-container {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+/* 左侧抽奖主区域 */
+.lottery-main {
+    flex: 1;
+    min-width: 500px;
+}
+
+/* 右侧中奖记录区域 */
+.winner-records {
+    width: 350px;
+    min-width: 300px;
+    margin-top: 0;
+    align-self: flex-start;
+}
+
+.activity-title {
+    font-size: 42px;
+    margin-bottom: 30px;
+    color: var(--text-color);
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* 奖项选择器 */
+.award-selector {
+    margin-bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.award-selector label {
+    font-size: 18px;
+    margin-right: 15px;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.award-selector select {
+    width: auto;
+    min-width: 250px;
+    font-size: 16px;
+    padding: 12px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* 奖项信息 */
+.award-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 30px;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: transform 0.3s ease;
+}
+
+.award-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.award-image-container {
+    width: 120px;
+    height: 120px;
+    margin-right: 30px;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.award-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.award-image-container:hover img {
+    transform: scale(1.1);
+}
+
+.award-details h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+.award-details p {
+    font-size: 18px;
+    color: var(--text-light);
+}
+
+/* 抽奖轮盘 */
+.lottery-wheel {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    position: relative;
+}
+
+.lottery-wheel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.05), rgba(76, 175, 80, 0.05));
+    pointer-events: none;
+}
+
+.wheel-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+#rollingNames {
+    font-size: 48px;
+    font-weight: bold;
+    color: var(--primary-color);
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: none;
+}
+
+/* 滚动动画效果 */
+@keyframes rolling {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* 中奖动画效果 */
+@keyframes winAnimation {
+    0% { transform: scale(1); opacity: 1; }
+    20% { transform: scale(1.5); opacity: 0.8; }
+    40% { transform: scale(1.2); opacity: 1; }
+    60% { transform: scale(1.4); opacity: 0.9; }
+    80% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.win-animation {
+    animation: winAnimation 1s ease-in-out;
+    color: var(--success-color) !important;
+}
+
+/* 抽奖控制按钮 */
+.lottery-controls {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+#startBtn,
+#stopBtn,
+#resetAwardBtn {
+    padding: 18px 50px;
+    font-size: 20px;
+    border-radius: 50px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+}
+
+#startBtn {
+    background-color: var(--success-color);
+    color: white;
+}
+
+#startBtn:hover:not(:disabled) {
+    background-color: #45a049;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
+}
+
+#stopBtn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+#stopBtn:hover:not(:disabled) {
+    background-color: #da190b;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(244, 67, 54, 0.3);
+}
+
+#resetAwardBtn {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+#resetAwardBtn:hover:not(:disabled) {
+    background-color: #d39e00;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.3);
+}
+
+#startBtn:disabled,
+#stopBtn:disabled,
+#resetAwardBtn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 中奖记录 */
+.winner-records {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 30px;
+}
+
+.winner-records-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(74, 144, 226, 0.1);
+}
+
+.winner-records h3 {
+    font-size: 22px;
+    text-align: left;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+.export-btn {
+    padding: 10px 20px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.export-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.records-container {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+/* 滚动条样式优化 */
+.records-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.records-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+.records-container::-webkit-scrollbar-thumb {
+    background: rgba(74, 144, 226, 0.5);
+    border-radius: 4px;
+}
+
+.records-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 144, 226, 0.7);
+}
+
+.record-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    animation: slideIn 0.5s ease-out;
+}
+
+.record-item:hover {
+    background-color: rgba(74, 144, 226, 0.05);
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 4px;
+}
+
+.record-item:last-child {
+    border-bottom: none;
+}
+
+.record-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text-color);
+    width: 120px;
+    text-align: left;
+}
+
+.record-award {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.record-time {
+    color: var(--text-lighter);
+    font-size: 14px;
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* 滑入动画 */
+@keyframes slideIn {
+    0% { transform: translateX(-100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+/* 弹窗样式 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(10px);
+    margin: 15% auto;
+    padding: 20px 30px 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal h3 {
+    margin-top: 0;
+    color: var(--text-color);
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.modal p {
+    color: var(--text-light);
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.modal-buttons button {
+    padding: 12px 24px;
+    margin: 0;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#confirmResetBtn,
+#closeValidationBtn,
+#closeSuccessBtn {
+    background-color: var(--success-color);
+    color: white;
+}
+
+#confirmResetBtn:hover,
+#closeValidationBtn:hover,
+#closeSuccessBtn:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+#cancelResetBtn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+#cancelResetBtn:hover {
+    background-color: #da190b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+/* 弹窗动画 */
+@keyframes modalFadeIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .settings-panel {
+        width: 350px;
+    }
+    
+    .settings-panel.collapsed {
+        transform: translateX(-60px);
+        width: 60px;
+        overflow: visible;
+    }
+    
+    .settings-panel.collapsed .toggle-btn {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .lottery-panel {
+        margin-left: 350px;
+    }
+    
+
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .settings-panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        max-height: 50vh;
+    }
+    
+    .panel-header {
+        padding: 15px 10px;
+    }
+    
+    .toggle-btn {
+        width: 30px;
+        height: 30px;
+        margin-left: 5px;
+    }
+    
+    .settings-panel.collapsed {
+        transform: translateX(-60px);
+        width: 60px;
+        overflow: visible;
+    }
+    
+    .settings-panel.collapsed .toggle-btn {
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .lottery-panel {
+        margin-left: 0;
+        margin-top: 0;
+        padding: 20px;
+    }
+    
+    .activity-title {
+        font-size: 24px;
+    }
+    
+    #rollingNames {
+        font-size: 32px;
+    }
+    
+    .award-info {
+        flex-direction: column;
+    }
+    
+    .award-image-container {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+}
+
+/* 中奖动效容器 */
+.win-effect-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.win-effect-container.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 中奖内容 */
+.win-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: winContentAppear 0.5s ease-out;
+    color: white;
+}
+
+.win-content h2 {
+    font-size: 48px;
+    margin-bottom: 30px;
+    animation: pulse 1s infinite;
+}
+
+.win-content p {
+    font-size: 36px;
+    margin: 20px 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+}
+
+/* 彩带容器 */
+.confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* 彩带样式 */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    border-radius: 50%;
+    display: inline-block;
+    animation: fall linear forwards;
+}
+
+/* 全屏按钮 */
+.fullscreen-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.fullscreen-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.fullscreen-icon {
+    font-size: 24px;
+    color: white;
+}
+
+/* 中奖内容出现动画 */
+@keyframes winContentAppear {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 彩带下落动画 */
+@keyframes fall {
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}

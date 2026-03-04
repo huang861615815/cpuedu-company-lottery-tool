@@ -693,14 +693,31 @@ function startLottery() {
     try {
         const lotteryMusic = document.getElementById('lotteryMusic');
         if (lotteryMusic) {
-            lotteryMusic.play().catch(e => {
-                console.log('音乐播放失败:', e);
-                // 音乐播放失败不影响抽奖流程
-            });
+            // 确保音频已加载
+            lotteryMusic.load();
+            lotteryMusic.volume = 0.8;
+            
+            // 尝试播放并处理可能的错误
+            const playPromise = lotteryMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('音乐播放成功');
+                }).catch(error => {
+                    console.warn('音乐自动播放被阻止，需要用户交互:', error);
+                    // 添加点击事件以便用户可以手动播放
+                    document.addEventListener('click', function enableAudio() {
+                        lotteryMusic.play().then(() => {
+                            console.log('音乐通过用户交互开始播放');
+                        }).catch(e => {
+                            console.log('音乐播放失败:', e);
+                        });
+                        document.removeEventListener('click', enableAudio);
+                    }, { once: true });
+                });
+            }
         }
     } catch (error) {
         console.log('处理音频时出错:', error);
-        // 音频错误不影响抽奖流程
     }
     
     rollingInterval = setInterval(() => {

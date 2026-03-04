@@ -3,6 +3,7 @@ let isRolling = false; // 是否正在抽奖
 let rollingInterval; // 抽奖滚动定时器
 let currentAward = null; // 当前选中的奖项
 let awardParticipants = []; // 当前奖项的可选参与人员
+let audioContext = null; // 音频上下文
 let lotteryData = {
     activityName: '',
     activityBackground: null,
@@ -689,36 +690,8 @@ function startLottery() {
     startBtn.disabled = true;
     stopBtn.disabled = false;
     
-    // 播放抽奖音乐
-    try {
-        const lotteryMusic = document.getElementById('lotteryMusic');
-        if (lotteryMusic) {
-            // 确保音频已加载
-            lotteryMusic.load();
-            lotteryMusic.volume = 0.8;
-            
-            // 尝试播放并处理可能的错误
-            const playPromise = lotteryMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log('音乐播放成功');
-                }).catch(error => {
-                    console.warn('音乐自动播放被阻止，需要用户交互:', error);
-                    // 添加点击事件以便用户可以手动播放
-                    document.addEventListener('click', function enableAudio() {
-                        lotteryMusic.play().then(() => {
-                            console.log('音乐通过用户交互开始播放');
-                        }).catch(e => {
-                            console.log('音乐播放失败:', e);
-                        });
-                        document.removeEventListener('click', enableAudio);
-                    }, { once: true });
-                });
-            }
-        }
-    } catch (error) {
-        console.log('处理音频时出错:', error);
-    }
+    // 播放庆祝音效
+    playCelebrationSound();
     
     rollingInterval = setInterval(() => {
         const randomIndex = Math.floor(Math.random() * awardParticipants.length);
@@ -758,16 +731,8 @@ function stopLottery() {
     clearInterval(rollingInterval);
     stopBtn.disabled = true;
     
-    // 暂停抽奖音乐
-    try {
-        const lotteryMusic = document.getElementById('lotteryMusic');
-        if (lotteryMusic) {
-            lotteryMusic.pause();
-        }
-    } catch (error) {
-        console.log('处理音频时出错:', error);
-        // 音频错误不影响抽奖流程
-    }
+    // 播放中奖音效
+    playCelebrationSound();
     
     // 确定中奖人员
     const winner = determineWinner();
@@ -1330,10 +1295,72 @@ function exportToExcel() {
     link.setAttribute('download', `${lotteryData.activityName}_中奖记录.csv`);
     link.style.visibility = 'hidden';
     
-    // 添加到DOM并触发点击
+    // 添加到 DOM 并触发点击
     document.body.appendChild(link);
     link.click();
     
     // 清理
     document.body.removeChild(link);
 }
+
+// 初始化音频上下文
+function initAudioContext() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+}
+
+// 播放庆祝音效（使用浏览器合成器）
+function playCelebrationSound() {
+    try {
+        initAudioContext();
+        
+        if (!audioContext) return;
+        
+        // 创建振荡器生成音调
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // 设置音调频率（从低到高，营造庆祝效果）
+        const now = audioContext.currentTime;
+        oscillator.frequency.setValueAtTime(523.25, now); // C5
+        oscillator.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        oscillator.frequency.setValueAtTime(783.99, now + 0.2); // G5
+        oscillator.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+        
+        // 设置音量包络
+        gainNode.gain.setValueAtTime(0.3, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.5);
+        
+        console.log('庆祝音效播放成功');
+    } catch (error) {
+        console.log('音效播放失败:', error);
+    }
+}
+
+// 页面加载时初始化音频
+document.addEventListener('DOMContentLoaded', function() {
+    // 预初始化音频上下文（需要用户交互后才能播放）
+    initAudioContext();
+    
+    // 监听用户交互以解锁音频播放
+    const unlockAudio = () => {
+        initAudioContext();
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+        document.removeEventListener('keydown', unlockAudio);
+    };
+    
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('touchstart', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+});

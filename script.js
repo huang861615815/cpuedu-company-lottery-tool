@@ -690,8 +690,25 @@ function startLottery() {
     startBtn.disabled = true;
     stopBtn.disabled = false;
     
-    // 播放庆祝音效
-    playCelebrationSound();
+    // 播放抽奖音乐
+    try {
+        const lotteryMusic = document.getElementById('lotteryMusic');
+        if (lotteryMusic) {
+            lotteryMusic.load();
+            lotteryMusic.volume = 0.6;
+            
+            const playPromise = lotteryMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('音乐播放成功');
+                }).catch(error => {
+                    console.warn('音乐播放需要用户交互:', error);
+                });
+            }
+        }
+    } catch (error) {
+        console.log('处理音频时出错:', error);
+    }
     
     rollingInterval = setInterval(() => {
         const randomIndex = Math.floor(Math.random() * awardParticipants.length);
@@ -731,8 +748,16 @@ function stopLottery() {
     clearInterval(rollingInterval);
     stopBtn.disabled = true;
     
-    // 播放中奖音效
-    playCelebrationSound();
+    // 暂停音乐
+    try {
+        const lotteryMusic = document.getElementById('lotteryMusic');
+        if (lotteryMusic) {
+            lotteryMusic.pause();
+            lotteryMusic.currentTime = 0;
+        }
+    } catch (error) {
+        console.log('处理音频时出错:', error);
+    }
     
     // 确定中奖人员
     const winner = determineWinner();
